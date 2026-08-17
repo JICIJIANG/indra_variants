@@ -37,7 +37,6 @@ from indra_variants.app.utils import (
     _CLINVAR_DOT_COLORS,
     _GENE_STRIP_GRAPH_INNER_H,
     _GENE_STRIP_VH,
-    _NETWORK_HEADER_PX,
     _network_frame_style,
     _variant_strip_wrap_style,
 )
@@ -100,6 +99,7 @@ def _render_network_page(view_key: str, root_node_id: str, title: str,
 
     sidebar = html.Div(
         id={'type': 'edge-info', 'prot': view_key},
+        className='net-sidebar',
         children=[
             html.Div("Details",
                     style={'fontSize': 17, 'fontWeight': 600,
@@ -128,23 +128,44 @@ def _render_network_page(view_key: str, root_node_id: str, title: str,
         }
     )
 
+    sidebar_toggle = html.Div(
+        "◂", className='sidebar-toggle',
+        title="Collapse/expand sidebar",
+    )
+
     main_content = html.Div([
         html.Div([
-            dcc.Link("← Browser", href="/",
-                    style={'color': U['link'], 'textDecoration': 'none',
-                           'fontSize': 14, 'fontWeight': 600,
-                           'fontFamily': U['font_ui']}),
-            html.H4(title,
-                   style={'textAlign': 'center', 'margin': '6px 0 2px',
-                          'color': U['ink'],
-                          'fontFamily': U['font_display'],
-                          'fontWeight': 600}),
-            html.P("Select the root node to clear highlighting.",
-                   style={'textAlign': 'center', 'marginTop': 0,
-                          'marginBottom': 15, 'color': U['muted'],
-                          'fontFamily': U['font_ui'], 'fontSize': 13})
-        ], style={'padding': '14px 16px', 'background': U['panel'],
-                  'borderBottom': f'1px solid {U["rule"]}'}),
+            html.Div([
+                dcc.Link("← Browser", href="/",
+                        style={'color': U['link'], 'textDecoration': 'none',
+                               'fontSize': 14, 'fontWeight': 600,
+                               'fontFamily': U['font_ui']}),
+                html.Span("▾", className='net-header-toggle',
+                          title="Collapse/expand title",
+                          style={'color': U['muted'], 'fontFamily': U['font_ui']}),
+            ], style={'display': 'flex', 'alignItems': 'center',
+                      'justifyContent': 'space-between'}),
+            html.Div([
+                html.H4(title, className='net-header-title',
+                       style={'textAlign': 'center', 'lineHeight': 1.15,
+                              'marginTop': 0, 'marginBottom': 0,
+                              'color': U['ink'], 'fontSize': 17,
+                              'fontFamily': U['font_display'],
+                              'fontWeight': 600}),
+                html.P("Select the root node to clear highlighting.",
+                       className='net-header-subtitle',
+                       style={'textAlign': 'center', 'lineHeight': 1.2,
+                              'marginTop': 0,
+                              'marginBottom': 0, 'color': U['muted'],
+                              'fontFamily': U['font_ui'], 'fontSize': 13})
+            ], className='net-header-body'),
+        ], className='net-header',
+           style={'paddingTop': 6, 'paddingBottom': 6,
+                  'paddingLeft': 16, 'paddingRight': 16,
+                  'background': U['panel'],
+                  'borderBottom': f'1px solid {U["rule"]}',
+                  'flex': '0 0 auto'}),
+        html.Div(className='header-resize-handle'),
 
         dcc.Store(id={'type': 'store-els',  'prot': view_key},  data=els),
         dcc.Store(id={'type': 'store-edges', 'prot': view_key},  data=edge_set),
@@ -253,6 +274,7 @@ def _render_network_page(view_key: str, root_node_id: str, title: str,
                     },
                 ),
                 *([] if lollipop_figure is None else [
+                    html.Div(className='network-resize-handle'),
                     html.Div(
                         [
                             html.Div([
@@ -276,11 +298,20 @@ def _render_network_page(view_key: str, root_node_id: str, title: str,
                                             'fontSize': 11, 'padding': '2px 10px',
                                             'fontFamily': U['font_ui'],
                                         }),
+                                    html.Span("▾", className='net-map-toggle',
+                                              title="Collapse/expand variant map",
+                                              style={'color': U['muted'],
+                                                     'fontFamily': U['font_ui'],
+                                                     'marginLeft': 8}),
                                 ], style={
                                     'display': 'flex', 'alignItems': 'center',
                                     'justifyContent': 'space-between',
                                     'padding': '6px 10px 2px',
                                 }),
+                            ], style={
+                                'background': U['card'],
+                            }),
+                            html.Div([
                                 # ── ClinVar pathogenicity filter row ─────────
                                 html.Div([
                                     html.Span(
@@ -356,9 +387,6 @@ def _render_network_page(view_key: str, root_node_id: str, title: str,
                                     'padding': '3px 10px 5px',
                                     'borderTop': f'1px solid {U["rule"]}',
                                 }),
-                            ], style={
-                                'background': U['card'],
-                            }),
                             dcc.Graph(
                                 id={'type': 'gene-map', 'prot': view_key},
                                 figure=lollipop_figure,
@@ -366,6 +394,7 @@ def _render_network_page(view_key: str, root_node_id: str, title: str,
                                     'displayModeBar': False,
                                     'scrollZoom': True,
                                     'doubleClick': False,
+                                    'responsive': True,
                                 },
                                 style={
                                     'height': _GENE_STRIP_GRAPH_INNER_H,
@@ -374,7 +403,15 @@ def _render_network_page(view_key: str, root_node_id: str, title: str,
                                     'boxSizing': 'border-box',
                                 },
                             ),
+                        ], className='net-map-body', style={
+                            'flex': '1 1 auto',
+                            'minHeight': 0,
+                            'overflowY': 'auto',
+                            'display': 'flex',
+                            'flexDirection': 'column',
+                        }),
                         ],
+                        className='net-map-panel',
                         style={
                             **_variant_strip_wrap_style(),
                             'flex': f'0 0 {_GENE_STRIP_VH}',
@@ -384,48 +421,48 @@ def _render_network_page(view_key: str, root_node_id: str, title: str,
                         },
                     ),
                 ]),
+
+                html.Div([
+                    html.H4("Edge types",
+                            style={'margin': 0, 'fontSize': 14,
+                                   'fontWeight': 600,
+                                   'fontFamily': U['font_display'],
+                                   'color': U['ink'],
+                                   'letterSpacing': '0.02em'}),
+                    html.Ul([
+                        html.Li([html.Span('→',
+                                          style={'color': legend_colors.get(r, '#c9c4bf'),
+                                                 'marginRight': 8,
+                                                 'fontSize': 14}), r],
+                                style={'fontSize': 13, 'listStyle': 'none',
+                                       'margin': '6px 0',
+                                       'color': U['ink_soft'],
+                                       'fontFamily': U['font_ui']})
+                        for r in legend_rels
+                    ], style={'paddingLeft': 0, 'margin': '10px 0 0 0'})
+                ], style={'position': 'absolute',
+                          'top': 12, 'right': 22,
+                          'background': U['card'],
+                          'padding': '14px 18px',
+                          'borderRadius': 4,
+                          'border': f'1px solid {U["rule"]}',
+                          'boxShadow': U['shadow'],
+                          'fontFamily': U['font_ui'],
+                          'maxHeight': '60vh',
+                          'overflowY': 'auto',
+                          'zIndex': 10}),
             ],
             style={
                 'display': 'flex', 'flexDirection': 'column',
                 'flex': '1 1 auto', 'minHeight': 0,
-                'height': f'calc(100vh - {_NETWORK_HEADER_PX}px)',
+                'position': 'relative',
                 'gap': 10,
                 'padding': '12px 14px 14px',
                 'boxSizing': 'border-box',
             },
         ),
 
-        html.Div([
-            html.H4("Edge types",
-                    style={'margin': 0, 'fontSize': 14,
-                           'fontWeight': 600,
-                           'fontFamily': U['font_display'],
-                           'color': U['ink'],
-                           'letterSpacing': '0.02em'}),
-            html.Ul([
-                html.Li([html.Span('→',
-                                  style={'color': legend_colors.get(r, '#c9c4bf'),
-                                         'marginRight': 8,
-                                         'fontSize': 14}), r],
-                        style={'fontSize': 13, 'listStyle': 'none',
-                               'margin': '6px 0',
-                               'color': U['ink_soft'],
-                               'fontFamily': U['font_ui']})
-                for r in legend_rels
-            ], style={'paddingLeft': 0, 'margin': '10px 0 0 0'})
-        ], style={'position': 'absolute',
-                  'top': _NETWORK_HEADER_PX + 47, 'right': 22,
-                  'background': U['card'],
-                  'padding': '14px 18px',
-                  'borderRadius': 4,
-                  'border': f'1px solid {U["rule"]}',
-                  'boxShadow': U['shadow'],
-                  'fontFamily': U['font_ui'],
-                  'maxHeight': '60vh',
-                  'overflowY': 'auto',
-                  'zIndex': 10})
-
-    ], style={
+    ], className='net-main-content', style={
         'marginLeft': 350,
         'position': 'relative',
         'height': '100vh',
@@ -434,7 +471,7 @@ def _render_network_page(view_key: str, root_node_id: str, title: str,
         'flexDirection': 'column',
     })
 
-    return html.Div([sidebar, main_content])
+    return html.Div([sidebar, sidebar_toggle, main_content])
 
 
 def _app_footer():

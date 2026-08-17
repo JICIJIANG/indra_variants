@@ -187,9 +187,7 @@ def _variant_strip_wrap_style() -> dict:
     }
 
 
-# Header row under URL bar (approx.) — remainder is graph + bottom strip
-_NETWORK_HEADER_PX = 96
-_GENE_STRIP_VH_PCT = 38
+_GENE_STRIP_VH_PCT = 20
 _GENE_STRIP_VH = f"{_GENE_STRIP_VH_PCT}vh"
 _GENE_STRIP_GRAPH_INNER_H = f"calc({_GENE_STRIP_VH_PCT}vh - 56px)"
 
