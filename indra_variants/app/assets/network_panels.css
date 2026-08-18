@@ -1,0 +1,103 @@
+/* Collapsible/resizable panels on the variant-network detail page
+   (title header + variant-map strip). See network_panels.js for behavior. */
+
+.net-header-toggle,
+.net-map-toggle {
+    cursor: pointer;
+    user-select: none;
+    display: inline-block;
+    font-size: 12px;
+    line-height: 1;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: inherit;
+}
+
+.net-header-toggle:hover,
+.net-map-toggle:hover {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+.net-header-body.is-collapsed,
+.net-map-body.is-collapsed {
+    display: none !important;
+}
+
+.net-map-panel.is-collapsed {
+    flex: 0 0 auto !important;
+}
+
+.header-resize-handle,
+.network-resize-handle {
+    flex: 0 0 7px;
+    cursor: row-resize;
+    position: relative;
+}
+
+.header-resize-handle::after,
+.network-resize-handle::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 36px;
+    height: 3px;
+    border-radius: 2px;
+    background: #c9c4bf;
+    transform: translate(-50%, -50%);
+}
+
+.header-resize-handle:hover::after,
+.network-resize-handle:hover::after {
+    background: #9a948c;
+}
+
+.net-sidebar {
+    transition: width 0.18s ease, padding 0.18s ease;
+}
+
+.net-sidebar.is-collapsed {
+    width: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    border-right: none !important;
+    box-shadow: none !important;
+}
+
+.net-main-content {
+    transition: margin-left 0.18s ease;
+}
+
+.net-main-content.is-sidebar-collapsed {
+    margin-left: 0 !important;
+}
+
+.sidebar-toggle {
+    position: fixed;
+    top: 50%;
+    left: 350px;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fffcf7;
+    border: 1px solid #e0dbd2;
+    border-left: none;
+    border-radius: 0 4px 4px 0;
+    color: #6f6b63;
+    font-size: 11px;
+    cursor: pointer;
+    user-select: none;
+    z-index: 1001;
+    transition: left 0.18s ease;
+}
+
+.sidebar-toggle:hover {
+    background: #f2efe8;
+}
+
+.sidebar-toggle.is-collapsed {
+    left: 0;
+}
